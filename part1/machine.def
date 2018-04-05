@@ -1697,7 +1697,7 @@ DEFINST(SLTIU,			0x5e,
 	DGPR(RT), DNA, 		DGPR(RS), DNA, DNA)
 
 #define ADDOK_IMPL							\
-  {									\
+  {								 	            \
       SET_GPR(RD, !OVER(GPR(RS), GPR(RT)));				\
   }
 DEFINST(ADDOK, 			0x61,
@@ -1706,14 +1706,14 @@ DEFINST(ADDOK, 			0x61,
 	DGPR(RD), DNA,		DGPR(RS), DGPR(RT), DNA)
 
 #define BITCOUNT_IMPL							\
-  {									\
+  {									              \
     int n = GPR(RS);              \
     int c = 0;                    \
-    int i;                    \
-    for(i = 0; i < 32; i++) { \
+    int i;                        \
+    for(i = 0; i < 32; i++) {     \
       c += !(n>>i&1^UIMM);        \
-    }               \
-    SET_GPR(RT, c);  \
+    }                             \
+    SET_GPR(RT, c);               \
   }
 DEFINST(BITCOUNT, 			0x62,
 	"bitCount",			"t,s,u",

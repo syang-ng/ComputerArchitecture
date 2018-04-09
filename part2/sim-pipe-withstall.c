@@ -274,8 +274,11 @@ void pipeline_control() {
 
 void do_if() {
   if(ctl.cond) {
-    fd.NPC = ctl.target;
-    ctl.target = 0;
+    if(ctl.cond&2) {
+      fd.NPC = em.target;
+    } else {
+      fd.NPC = de.target;
+    }
     ctl.flag = FALSE;
     ctl.cond = FALSE;
   } else {
@@ -290,6 +293,7 @@ void do_if() {
 void do_id() {
     de.inst = fd.inst;
     de.PC = fd.PC;
+    de.target = 0;
     /* check if inst is nop, simply return */
     if(de.inst.a == NOP) {
       return;
@@ -330,7 +334,7 @@ READ_OPRAND_VALUE:
       break;
     case BNE:
       ctl.flag = TRUE; 
-      ctl.target = fd.PC + 8 + ((de.inst.b & 0xffff) << 2);
+      de.target = fd.PC + 8 + ((de.inst.b & 0xffff) << 2);
       de.func = ALU_SUB;
       break;
     case ANDI:
@@ -344,8 +348,8 @@ READ_OPRAND_VALUE:
       break;
     case JUMP:
       ctl.flag = TRUE;
-      ctl.cond = TRUE;
-      ctl.target = (fd.PC & 0xf0000000) | ((de.inst.b & 0x3ffffff) << 2);
+      ctl.cond |= 1;
+      de.target = (fd.PC & 0xf0000000) | ((de.inst.b & 0x3ffffff) << 2);
     default:
       de.func = ALU_NOP;
       break;        
@@ -399,6 +403,7 @@ void do_ex() {
   em.dstM = de.dstM;  
   em.valA = de.valA;
   em.rw = de.rw;
+  em.target = de.target;
   switch(de.func) {
     case ALU_ADD:
       em.valE = de.aluA + de.aluB;
@@ -424,7 +429,7 @@ void do_ex() {
   }
   if(ctl.flag) {
     if(em.valE) {
-      ctl.cond = TRUE;      
+      ctl.cond |= 2;      
     } else {
       ctl.flag = FALSE;
     }

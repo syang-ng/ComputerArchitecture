@@ -26,12 +26,15 @@ struct idex_buf {
   oprand_t oprand;		/* operand */
   int instFlags;  /* inst flag */
   int func;       /* alu func code */
+  int srcA;
+  int srcB;
   int aluA;
   int aluB;
   int valA;
   int dstE;
   int dstM;
   int rw;
+  int target;
 };
 
 /*define buffer between execute and memory stage*/
@@ -42,15 +45,16 @@ struct exmem_buf{
   int valA;
   int dstE;
   int dstM;
-  int rw;  
+  int rw;
+  int target;
 };
 
 /*define buffer between memory and writeback stage*/
 struct memwb_buf{
   md_inst_t inst;		/* instruction in MEM stage */
   md_addr_t PC;
+  int valE;  
   int valM;         /* val read from mem */
-  int valE;
   int dstE;
   int dstM;
   int rw;  
@@ -60,6 +64,10 @@ struct memwb_buf{
 struct wb_buf{
   md_inst_t inst;
   md_addr_t PC;
+  int valE;  
+  int valM;
+  int dstE;
+  int dstM;
 };
 
 struct control_buf {
@@ -67,7 +75,6 @@ struct control_buf {
   int cond;
   int regs;
   int stall;
-  int target;
 };
 
 typedef enum {
@@ -99,8 +106,19 @@ void do_wb();
 /*pipeline control*/
 void pipeline_control();
 
+/*do forward*/
+void do_forward();
+void forward();
+
 /*log*/
 void do_log();
+
+/*init*/
+void init_fd();
+void init_de();
+void init_em();
+void init_mw();
+void init_wb();
 
 #define MD_FETCH_INSTI(INST, MEM, PC)					\
   { INST.a = MEM_READ_WORD(mem, (PC));					\

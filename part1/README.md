@@ -1,6 +1,6 @@
-# part1
+# Part1
 
-## debug process
+## Debug process
 
 At first, we can use `sslittle-na-sstrix-objdump`
 
@@ -45,9 +45,9 @@ And in `<biCount>` of test2.asm, we can also find `0x00000062:02030001`:
   ...
 ```
 
-Obviously, there are two instructions. Now, we know that the opcode of `addOK` is `61`, opcode of `bitCount` is `62`
+Obviously, those two instructions are which we need to implement. Now, we know that the opcode of `addOK` is `61`, opcode of `bitCount` is `62`
 
-## how to support
+## How to support
 
 As doc mentioned, `addOK` and `bitCount` are the same as `add` and `xori`, so we can simply modify them to support new instructions.
 
@@ -83,10 +83,24 @@ DEFINST(BITCOUNT, 			0x62,
 	DGPR(RT), DNA, 		DGPR(RS), DNA, DNA)
 ```
 
-## dir structure
+## Dir structure
 
 Actually, we only need to modify the `machine.def` to be a new version supporting those instructions, but if we want to achieve more features, we will modify `sim-fast.c`
 
 * `machine.def` new version to support 
 * `sim-fast.c` sim-fast source code
 * `README.md` readme
+
+## How to run
+
+```shell
+## replace the machine.def with which in this dir
+cp machine.def ../simplesim-3.0/
+## make
+make clean
+make config-pisa
+make sim-fast
+## run
+sim-fast test1
+sim-fast test2
+```

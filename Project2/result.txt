@@ -1,0 +1,6 @@
+Clock Cycles: 19130281
+Memory Accesses: 11068194
+Memory Hits: 10729052
+Memory Misses: 339142
+Line Replacements: 339078
+Line Write-backs: 20214

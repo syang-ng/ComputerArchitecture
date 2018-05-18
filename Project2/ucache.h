@@ -43,6 +43,10 @@ void de_cache_set(cache_set_t *);
 
 int cache_access(cache_t *, md_addr_t, word_t *, cache_word_func);
 
+int cache_read(cache_t *, md_addr_t, word_t *);
+
+int cache_wrtie(cache_t *, md_addr_t, word_t *);
+
 void cache_word_read(cache_line_t *, word_t *, int);
 
 void cache_word_write(cache_line_t *, word_t *, int);

@@ -178,3 +178,21 @@ cache_line_t *malloc_cache_line(md_addr_t addr) {
 ```
 
 Since we malloc a new buffer to store the data loaded from memory, and replace the old one with this new cache line, the program will access it as usual.
+
+At last, when we finish executing our program, we must write all cache back
+
+```C
+void cache_flush(cache_t* cache) {
+  cache_set_t *set;
+  cache_line_t *line;
+  int i;
+  for(i = 0; i < 16; i++) {
+    set = &cache->sets[i];
+    for(line = set->head; line != NULL; line = line->next) {
+      if(line->dirty) {
+        cache_write_back(line, i);
+      }
+    }
+  }
+}
+```

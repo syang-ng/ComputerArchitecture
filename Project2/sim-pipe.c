@@ -519,7 +519,7 @@ void do_mem() {
   int cycles = 0;    
   if(mw.rw&4) { /* load */
     if(cache.enable){
-      cycles = cache_read(&cache, mw.valE, &mw.valM);
+      cycles = cache_read(&cache, mw.valE, (word_t *)&mw.valM);
     } else {
       mw.valM = READ_WORD(mw.valE, _fault);
       if(_fault != md_fault_none){
@@ -530,7 +530,7 @@ void do_mem() {
     ctl.regs &= ~(1 << mw.dstM);
   } else if(mw.rw&2) { /* save */
     if(cache.enable){
-      cycles = cache_write(&cache, mw.valE, &em.valA);
+      cycles = cache_write(&cache, mw.valE, (word_t *)&em.valA);
     } else {
       WRITE_WORD(em.valA, mw.valE, _fault);
       if(_fault != md_fault_none){
@@ -559,6 +559,7 @@ void do_wb() {
     SET_GPR(mw.dstE, mw.valE);
   }
   if(wb.inst.a == SYSCALL){
+    cache_flush(&cache);
     cache_log();
     SYSCALL(wb.inst);
   }
@@ -733,6 +734,20 @@ int cache_read(cache_t *cache, md_addr_t addr, word_t *word) {
 
 int cache_write(cache_t *cache, md_addr_t addr, word_t *word) {
   return cache_access(cache, addr, word, cache_word_write);
+}
+
+void cache_flush(cache_t* cache) {
+  cache_set_t *set;
+  cache_line_t *line;
+  int i;
+  for(i = 0; i < 16; i++) {
+    set = &cache->sets[i];
+    for(line = set->head; line != NULL; line = line->next) {
+      if(line->dirty) {
+        cache_write_back(line, i);
+      }
+    }
+  }
 }
 
 cache_line_t *malloc_cache_line(md_addr_t addr) {
